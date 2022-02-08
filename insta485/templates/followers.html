@@ -1,0 +1,41 @@
+{% extends "index.html" %}
+{% block body %}
+<p class="subName">Followers</p>
+{% for follow in followers %}
+<div class="myDivSubBody">
+    <ul class="head">
+        <li class="leftAlignHead" style="
+              font-family: Comic Sans MS, Comic Sans, cursive;
+              font-size: 30px;
+            ">
+            <ul class="head">
+                <li class="leftAlignHead">
+                    <img alt="{{ follow.username }}" src="/uploads/{{ follow.user_img_url }}" width="50" />
+                </li>
+                <li class="leftAlignHead">
+                    <a href="{{ "/users/{}/".format(follow.username) }}">{{ follow.username }}</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="rightSubAlign">
+            {% if (logname != follow.username) and (not follow.logname_follows_username) %}
+            not following
+            <form action="/following/?target=/" method="post" enctype="multipart/form-data">
+            <input type="submit" name="follow" value="follow"/>
+            <input type="hidden" name="username" value="{{ follow.username }}"/>
+            <input type="hidden" name="operation" value="follow"/>
+            </form>
+            {% elif (logname != follow.username) and follow.logname_follows_username %}
+            following
+            <form action="/following/?target=/" method="post" enctype="multipart/form-data">
+            <input type="submit" name="unfollow" value="unfollow"/>
+            <input type="hidden" name="username" value="{{ follow.username }}"/>
+            <input type="hidden" name="operation" value="unfollow"/>
+            </form>
+            {% endif %}
+        </li>
+    </ul>
+</div>
+{% endfor %}
+{% endblock body %}

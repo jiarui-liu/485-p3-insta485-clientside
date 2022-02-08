@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>insta485</title>
+        <link rel="stylesheet" href="/static/css/style.css" />
+    </head>
+
+    <body>
+        <div class="myDivHead">
+            <ul class="head">
+                <li style="
+            font-family: Comic Sans MS, Comic Sans, cursive;
+            font-size: 50px;
+          " class="leftAlign">
+                    <a href="/">
+                        <ul class="head">
+                            <li class="leftAlign">
+                                <img alt="logo" src="/static/images/logo.png" width="80" />
+                            </li>
+                            <li class="leftAlign">| insta485</li>
+                        </ul>
+                    </a>
+                </li>
+                <li class="rightAlign">
+                    <a class="active" href="/explore/">explore</a>
+                </li>
+                <li class="rightAlign">|</li>
+                <li class="rightAlign">
+                    <a class="active" href="{{ "/users/{}/".format(logname) }}">{{logname}}</a>
+                </li>
+            </ul>
+
+            <hr class="grey" />
+        </div>
+
+        <div class="myDivBody">
+            {% block body %}
+            {% for post in posts %}
+            <div class="myDivSubBody">
+                <ul class="head">
+                    <li class="leftAlignHead" style="
+              font-family: Comic Sans MS, Comic Sans, cursive;
+              font-size: 25px;
+            ">
+                        <ul class="head">
+                            <li class="leftAlignHead">
+                                <a href="{{ "/users/{}/".format(post.owner) }}"><img alt="{{ post.owner }}"
+                                        src="/uploads/{{ post.owner_img_url }}" width="40" /></a>
+                            </li>
+                            <li class="leftAlignHead">
+                                <a href="{{ "/users/{}/".format(post.owner) }}">{{ post.owner }}</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="rightSubAlign"><a href="{{ "/posts/{}/".format(post.postid) }}">{{ post.created }}</a>
+                    </li>
+                </ul>
+                <img alt="{{ post.owner }}" src="/uploads/{{ post.filename }}" style="width: 100%" />
+                <p style="font-size: 20px; padding: 5px">
+                    {% if post.likes == 1 %}
+                    {{ "{} like".format(post.likes) }}
+                    {% else %}
+                    {{ "{} likes".format(post.likes) }}
+                    {% endif %}
+                </p>
+                <ul class="main">
+                    {% for comments in post.comments %}
+                    <li class="comment">
+                        <b><a href="{{ "/users/{}/".format(comments.owner) }}">{{ comments.owner }}</a></b> {{
+                        comments.text }}
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                {% if post.isLiked == 0 %}
+                <form action="/likes/?target=/" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="operation" value="like"/>
+                <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                <input type="submit" name="like" value="like"/>
+                </form>
+                {% else %}
+                <form action="/likes/?target=/" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="operation" value="unlike"/>
+                <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                <input type="submit" name="unlike" value="unlike"/>
+                </form>
+                {% endif %}
+
+                <form action="/comments/?target=/" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="operation" value="create"/>
+                    <input type="hidden" name="postid" value="{{ post.postid }}"/>
+                    <input type="text" name="text" required/>
+                    <input type="submit" name="comment" value="comment"/>
+                  </form>
+            </div>
+
+            {% endfor %}
+
+            {% endblock %}
+        </div>
+    </body>
+
+</html>

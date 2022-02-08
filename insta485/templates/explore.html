@@ -1,0 +1,29 @@
+{% extends "index.html" %} {% block body %}
+<p class="subName">Discover People</p>
+{% for follow in not_following %}
+<div class="myDivSubBody">
+    <ul class="head">
+        <li class="leftAlignHead" style="
+              font-family: Comic Sans MS, Comic Sans, cursive;
+              font-size: 30px;
+            ">
+            <ul class="head">
+                <li class="leftAlignHead">
+                    <img alt="{{ follow.username }}" src="/uploads/{{ follow.user_img_url }}" width="50" />
+                </li>
+                <li class="leftAlignHead">
+                    <a href="{{ "/users/{}/".format(follow.username) }}">{{ follow.username }}</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="rightSubAlign">
+            <form action="/following/?target=/" method="post" enctype="multipart/form-data">
+            <input type="submit" name="follow" value="follow"/>
+            <input type="hidden" name="username" value="{{ follow.username }}"/>
+            <input type="hidden" name="operation" value="follow"/>
+            </form>
+        </li>
+    </ul>
+</div>
+{% endfor %} {% endblock %}

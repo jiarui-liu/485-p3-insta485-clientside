@@ -1,0 +1,58 @@
+{% extends "index.html" %}
+{% block body %}
+<p class="subName">{{ username }}</p>
+
+{% if (logname == username) %}
+<h4> <a href="/accounts/edit/"> Edit profile </a></h4>
+<form action="/accounts/logout/?target=/accounts/login/" method="post" enctype="multipart/form-data">
+    <input type="submit" name="logout" value="Logout"/>
+  </form>
+{% elif not logname_follows_username %}
+<p style="font-size: 20px">not following</p>
+<form action="/following/?target=/" method="post" enctype="multipart/form-data">
+    <input type="submit" name="follow" value="follow"/>
+    <input type="hidden" name="username" value="{{ username }}"/>
+    <input type="hidden" name="operation" value="follow"/>
+  </form>
+{% else %}
+<p style="font-size: 20px">following</p>
+<form action="/following/?target=/" method="post" enctype="multipart/form-data">
+    <input type="submit" name="unfollow" value="unfollow"/>
+    <input type="hidden" name="username" value="{{ username }}"/>
+    <input type="hidden" name="operation" value="unfollow"/>
+  </form>
+{% endif %}
+
+
+<p style="font-size: 20px">
+    {% if total_posts == 1 %}
+    {{ "{} post".format(total_posts) }}
+    {% else %}
+    {{ "{} posts".format(total_posts) }}
+    {% endif %}
+    <a href={{ "/users/{}/followers/" .format(username) }}><b>
+            {% if followers == 1 %}
+            {{ "{} follower".format(followers) }}
+            {% else %}
+            {{ "{} followers".format(followers) }}
+            {% endif %}
+        </b></a>
+    <a href={{ "/users/{}/following/" .format(username) }}><b>{{ "{} following".format(following) }}</b></a>
+</p>
+<p style="font-size: 20px">{{ fullname }}</p>
+
+{% if (logname == username) %}
+<form action="/posts/?target={{ "/users/{}/".format(logname) }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept="image/*" required/>
+    <input type="submit" name="create_post" value="upload new post"/>
+    <input type="hidden" name="operation" value="create"/>
+  </form>
+{% endif %}
+
+<div>
+    {% for post in posts %}
+    <a href={{ "/posts/{}/" .format(post.postid) }} class="horizontal"><img alt="left" src="/uploads/{{ post.filename }}"
+            style="width: 48%" /></a>
+    {% endfor %}
+</div>
+{% endblock %}

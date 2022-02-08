@@ -1,0 +1,21 @@
+{% extends "login.html" %} {% block body %}
+
+<form action="/accounts/?target=/" method="post" enctype="multipart/form-data">
+	photo <input type="file" name="file" required />
+	<br />
+	fullname <input type="text" name="fullname" required />
+	<br />
+	username <input type="text" name="username" required />
+	<br />
+	email <input type="text" name="email" required />
+	<br />
+	password <input type="password" name="password" required />
+	<br />
+	<input type="submit" name="signup" value="sign up" />
+	<input type="hidden" name="operation" value="create" />
+</form>
+<h4>Already have an account? <a href="/accounts/login/"> log in </a></h4>
+
+<h4>Already have an account? <a href="/accounts/login/"> log in </a></h4>
+
+{% endblock %}

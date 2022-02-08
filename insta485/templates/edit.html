@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+{% block body %}
+{% for user in user_info %}
+<ul class="head">
+    <li
+		class="leftAlignHead"
+		style="font-family: Comic Sans MS, Comic Sans, cursive; font-size: 25px"
+	>
+        <ul class="head">
+            <li class="leftAlignHead">
+                <a href="{{ "/users/{}/".format(logname) }}"><img alt="{{ logname }}" src="/uploads/{{ user.filename }}" width="40" /></a>
+            </li>
+                <li class="leftAlignHead">
+                    <a href="{{ "/users/{}/".format(logname) }}">{{ logname }}</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<form action="/accounts/?target=/accounts/edit/" method="post" enctype="multipart/form-data">
+  Photo <input type="file" name="file" accept="image/*"/>
+  <br />
+  Name <input type="text" name="fullname" value="{{ user.fullname }}" required/>
+  <br />
+  Email <input type="text" name="email" value="{{ user.email }}" required/>
+  <input type="submit" name="update" value="submit"/>
+  <input type="hidden" name="operation" value="edit_account"/>
+</form>
+{% endfor %}
+
+<p><a href="/accounts/password/"><b>Change password</b></a></p>
+<br />
+<p><a href="/accounts/delete/"><b>Delete account</b></a></p>
+
+{% endblock %}

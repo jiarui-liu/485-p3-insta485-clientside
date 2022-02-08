@@ -1,0 +1,20 @@
+#!/bin/bash
+# insta485run
+
+set -Eeuo pipefail
+set -x
+
+FILE=var/insta485.sqlite3
+if [ ! -f "$FILE" ]; then
+    ./bin/insta485db create
+else
+    echo "the database already exists!"
+    exit 1
+fi
+
+test -e var/insta485.sqlite3
+export FLASK_ENV=development
+FLASK_ENV=development
+export FLASK_APP=insta485
+FLASK_APP=insta485
+flask run --host 0.0.0.0 --port 8000

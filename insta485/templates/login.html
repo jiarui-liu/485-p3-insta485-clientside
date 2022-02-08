@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>insta485</title>
+		<link rel="stylesheet" href="/static/css/style.css" />
+	</head>
+
+	<body>
+		<div class="myDivHead">
+			<ul class="head">
+				<li
+					style="
+						font-family: Comic Sans MS, Comic Sans, cursive;
+						font-size: 50px;
+					"
+					class="leftAlign"
+				>
+					<a href="/">
+						<ul class="head">
+							<li class="leftAlign">
+								<img alt="logo" src="/static/images/logo.png" width="80" />
+							</li>
+							<li class="leftAlign">| insta485</li>
+						</ul>
+					</a>
+				</li>
+				<li class="rightAlign">
+					<a class="active" href="/accounts/login/">login</a>
+				</li>
+			</ul>
+
+			<hr class="grey" />
+		</div>
+
+		<div class="myDivBody">
+			{% block body %}
+			<form
+				action="/accounts/?target=/"
+				method="post"
+				enctype="multipart/form-data"
+			>
+				username <input type="text" name="username" required /> password
+				<input type="password" name="password" required />
+				<input type="submit" value="login" />
+				<input type="hidden" name="operation" value="login" />
+			</form>
+			<p>
+				Don't have an account? <a href="/accounts/create/"><b>Sign up</b></a>
+			</p>
+			{% endblock %}
+		</div>
+	</body>
+</html>
