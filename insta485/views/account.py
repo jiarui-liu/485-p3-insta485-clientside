@@ -202,8 +202,10 @@ def process_accounts_delete(connection):
     filename = connection.execute(
         "SELECT filename FROM posts WHERE "
         "owner = ?", (logname, )
-    ).fetchall()[0]['filename']
-    os.remove(os.path.join(insta485.app.config['UPLOAD_FOLDER'], filename))
+    ).fetchall()
+    if len(filename) != 0:
+        filename = filename[0]['filename']
+        os.remove(os.path.join(insta485.app.config['UPLOAD_FOLDER'], filename))
     # delete this user from posts table
     connection.execute(
         "DELETE FROM posts WHERE "
