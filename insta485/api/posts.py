@@ -106,31 +106,6 @@ def context_generator(username, postid=None):
   if count == size:
     context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(postid_lte)
   
-  """
-  postid_idx = num_post - 1
-  for id in range(num_post):
-    if posts[id]['postid'] == postid_lte:
-      postid_idx = id
-  
-  curr_idx = postid_idx - page*size
-  count = 0
-
-  while curr_idx != 1 and count < size:
-    id = posts[curr_idx]['postid']
-    if id < postid_lte:
-      context["results"].append({"postid":id,"url":flask.request.path+str(id)+"/"})
-      count += 1
-    curr_idx -= 1
-  if count == size:
-    context['next'] = flask.request.path+"/?size="+str(size)+"&page="+str(page-1)+"&postid_lte"+str(postid_lte)
-  if page == 0:
-    if size != 0:
-      context["url"] = flask.request.path+"?size"+str(size)
-    if postid_lte != posts[num_post-1]["postid"]:
-      context["url"] += "&postid_lte="+str(postid_lte)
-  else:
-    context["url"] = flask.request.path+"?size"+str(size)+"&page="+str(page)+"&postid_lte"+str(postid_lte)
-  """
   return context
     
 @insta485.app.route('/api/v1/posts/')
@@ -167,26 +142,97 @@ def get_all_post():
 
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
 def get_post(postid_url_slug):
-    """Return post on postid.
-    Example:
-    {
-      "created": "2017-09-28 04:33:28",
-      "imgUrl": "/uploads/122a7d27ca1d7420a1072f695d9290fad4501a41.jpg",
-      "owner": "awdeorio",
-      "ownerImgUrl": "/uploads/e1a7c5c32973862ee15173b0259e3efdb6a391af.jpg",
-      "ownerShowUrl": "/users/awdeorio/",
-      "postShowUrl": "/posts/1/",
-      "url": "/api/v1/posts/1/"
-    }
-    """
+    """Return post detail on postid."""
+    username, password = authenticate()
+    if password == 0:
+      return username
 
     context = {
-        "created": "2017-09-28 04:33:28",
-        "imgUrl": "/uploads/122a7d27ca1d7420a1072f695d9290fad4501a41.jpg",
-        "owner": "awdeorio",
-        "ownerImgUrl": "/uploads/e1a7c5c32973862ee15173b0259e3efdb6a391af.jpg",
-        "ownerShowUrl": "/users/awdeorio/",
-        "postid": "/posts/{}/".format(postid_url_slug),
-        "url": flask.request.path,
+        "comments":[],
+        "created": "",
+        "imgUrl": "",
+        "likes": {"lognameLikesThis":False,
+                  "numLikes":0,
+                  "url":"null"},
+        "owner": "",
+        "ownerImgUrl": "",
+        "ownerShowUrl": "",
+        "postShowUrl": "",
+        "postid": 0,
+        "url": ""
     }
+    connection = insta485.model.get_db()
+     # Select post detail and owner.
+    cur = connection.execute(
+            "SELECT * "
+            "FROM posts "
+            "WHERE postid = ?",
+            (postid_url_slug,)
+    )
+    cur = cur.fetchall()
+    if len(cur) == 0:
+      return handle_invalid_usage(InvalidUsage("Forbidden", 404))
+      
+    owner = cur[0]["owner"]
+    context["created"] = cur[0]["created"]
+    cur = connection.execute(
+            "SELECT filename "
+            "FROM users "
+            "WHERE username = ?",
+            (owner,)
+    )
+    context["owner"] = owner
+    context["ownerImgUrl"] = "/uploads/"+cur.fetchall()[0]["filename"]
+    context["ownerShowUrl"] =  "/users/{}/".format(owner)
+    context["postShowUrl"] = "/posts/{}/".format(postid_url_slug)
+    context["postid"] = postid_url_slug
+    context["url"] = "/api/v1/posts/{}/".format(postid_url_slug)
+
+    # Select comment.
+    cur = connection.execute(
+            "SELECT commentid, owner, text "
+            "FROM comments "
+            "WHERE postid = ?"
+            "ORDER BY commentid",
+            (postid_url_slug,)
+        )
+    for comment in cur.fetchall():
+      context["comments"].append({
+        "commentid":comment["commentid"],
+        "lognameOwnsThis":username==comment["owner"],
+        "owner":comment["owner"],
+        "ownerShowUrl": "/users/"+ comment["owner"]+"/",
+        "text": comment["text"],
+        "url": "/api/v1/comments/{}/".format(comment["commentid"])
+      })
+    # Select image.
+    cur = connection.execute(
+            "SELECT filename "
+            "FROM posts "
+            "WHERE postid = ?",
+            (postid_url_slug,)
+        )
+    context["imgUrl"]="/uploads/"+cur.fetchall()[0]["filename"]
+    
+    # Select likes.
+    cur = connection.execute(
+            "SELECT likeid "
+            "FROM likes "
+            "WHERE postid = ? AND owner = ?",
+            (postid_url_slug,username)
+        )
+    like = cur.fetchall()
+    if like is not None:
+      context["likes"]["lognameLikesThis"] = True
+      context["likes"]["url"] = "/api/v1/likes/"+str(like[0]["likeid"])+"/"
+    
+    cur = connection.execute(
+            "SELECT * "
+            "FROM likes "
+            "WHERE postid = ?",
+            (postid_url_slug,)
+        )
+    context["likes"]["numLikes"] = len(cur.fetchall())
+
+   
     return flask.jsonify(**context)
