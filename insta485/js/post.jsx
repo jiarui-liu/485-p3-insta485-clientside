@@ -3,15 +3,17 @@ import PropTypes from 'prop-types';
 
 class Post extends React.Component {
   /* Display number of image and post owner of a single post
-   */
+ */
 
   constructor(props) {
+    // runs when an instance is created
     // Initialize mutable state
     super(props);
     this.state = { imgUrl: '', owner: '' };
   }
 
   componentDidMount() {
+    // runs when an instance is added to the DOM
     // This line automatically assigns this.props.url to the const variable url
     const { url } = this.props;
 
@@ -24,13 +26,14 @@ class Post extends React.Component {
       .then((data) => {
         this.setState({
           imgUrl: data.imgUrl,
-          owner: data.owner
+          owner: data.owner,
         });
       })
       .catch((error) => console.log(error));
   }
 
   render() {
+    // returns HTML representing this component
     // This line automatically assigns this.state.imgUrl to the const variable imgUrl
     // and this.state.owner to the const variable owner
     const { imgUrl, owner } = this.state;
@@ -38,10 +41,8 @@ class Post extends React.Component {
     // Render number of post image and post owner
     return (
       <div className="post">
-        <img src={imgUrl} />
-        <p>
-          {owner}
-        </p>
+        <img src={imgUrl} alt="imgUrl" />
+        <p>{owner}</p>
       </div>
     );
   }
