@@ -100,7 +100,7 @@ def test_like_exists(client):
     )
     assert response.status_code == 200
     assert response.get_json() == {
-        "likeid": "6",
+        "likeid": 6,
         "url": "/api/v1/likes/6/",
         }
 

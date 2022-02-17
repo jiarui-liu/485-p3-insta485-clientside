@@ -1,10 +1,6 @@
 """REST API for posts."""
-from tracemalloc import start
 import flask
 import insta485
-import hashlib
-import uuid
-from flask import jsonify, session
 
 
 class InvalidUsage(Exception):
@@ -25,7 +21,7 @@ class InvalidUsage(Exception):
 
 @insta485.app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
-    response = jsonify(error.to_dict())
+    response = flask.jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
 
@@ -139,7 +135,7 @@ def get_all_post():
     """GET /api/v1/posts/, return 10 newest posts."""
     username = authenticate()
     context = context_generator(username)
-    return flask.jsonify(**context)
+    return flask.jsonify(**context), 200
 
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
 def get_post(postid_url_slug):
@@ -233,5 +229,4 @@ def get_post(postid_url_slug):
         )
     context["likes"]["numLikes"] = len(cur.fetchall())
 
-   
-    return flask.jsonify(**context)
+    return flask.jsonify(**context), 200
