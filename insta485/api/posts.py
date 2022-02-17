@@ -141,24 +141,18 @@ def get_all_post():
     context = context_generator(username)
     return flask.jsonify(**context)
 
-
-
-
-
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
 def get_post(postid_url_slug):
-    """Return post detail on postid."""
+    """GET /api/v1/posts/<postid>/, return post detail on postid."""
     username = authenticate()
-    if password == 0:
-      return username
 
     context = {
         "comments":[],
         "created": "",
         "imgUrl": "",
-        "likes": {"lognameLikesThis":False,
-                  "numLikes":0,
-                  "url":"null"},
+        "likes": {"lognameLikesThis": False,
+                  "numLikes": 0,
+                  "url": None},
         "owner": "",
         "ownerImgUrl": "",
         "ownerShowUrl": "",
@@ -224,10 +218,10 @@ def get_post(postid_url_slug):
             "SELECT likeid "
             "FROM likes "
             "WHERE postid = ? AND owner = ?",
-            (postid_url_slug,username)
+            (postid_url_slug, username,)
         )
     like = cur.fetchall()
-    if like is not None:
+    if like:
       context["likes"]["lognameLikesThis"] = True
       context["likes"]["url"] = "/api/v1/likes/"+str(like[0]["likeid"])+"/"
     
