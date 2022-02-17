@@ -166,7 +166,7 @@ def get_post(postid_url_slug):
     )
     cur = cur.fetchall()
     if len(cur) == 0:
-      return handle_invalid_usage(InvalidUsage("Forbidden", 404))
+      return handle_invalid_usage(InvalidUsage("Not Found", 404))
       
     owner = cur[0]["owner"]
     context["created"] = cur[0]["created"]
