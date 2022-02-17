@@ -30,109 +30,114 @@ def handle_invalid_usage(error):
     return response
 
 def authenticate():
-  """Validate the username and password / the user is logging in."""
-  if flask.request.authorization is None:
-    if 'username' not in flask.session:
-      raise InvalidUsage("Forbidden", status_code=403)
-    return flask.session['username'],0
+    """Validate the username and password the user is logging in."""
+    # authentication with session cookies
+    if flask.request.authorization is None:
+        if 'username' not in flask.session:
+            raise InvalidUsage("Forbidden", status_code=403)
+        return flask.session['username']
 
-  username = flask.request.authorization['username']
-  password = flask.request.authorization['password']
+    # HTTP basic authentication
+    username = flask.request.authorization['username']
+    password = flask.request.authorization['password']
 
-  if not username or not password:
-    raise InvalidUsage("Forbidden", status_code=403)
-  
-  return username,password
-
-
-
-def context_generator(username, postid=None):
-  connection = insta485.model.get_db()
-
-  if postid is None:
-      cur = insta485.views.index.all_posts_generator(connection, username)
-  else:
-      cur = insta485.views.index.single_posts_generator(connection, postid)
-  
-  posts = cur.fetchall()
-  context={"next":"",
-            "results":[],
-            "url":flask.request.path
-          }
-
-  num_post = len(posts)
-  postid_lte = flask.request.args.get("postid_lte", type=int)
-  page = flask.request.args.get("page",type=int)
-  size = flask.request.args.get("size",type=int)
-  
-
-  if size is None:
-    size=10
-  else:
-    context['url'] += "?size="+str(size)
-
-  if page is None:
-    page=0
-  else:
-    context['url'] += "&page="+str(page)
-
-  if postid_lte is None:
-    postid_lte=posts[0]['postid']
-  else:
-    context['url'] += "&postid_lte="+str(postid_lte)
-
-  
-  if size < 0 or page < 0:
-    raise InvalidUsage("Bad request", status_code=400)
-  
-  start_idx = 0
-  for i in range(num_post):
-    if posts[i]["postid"] == postid_lte:
-      start_idx = i
-      break
-    elif posts[i]["postid"] < postid_lte:
-      start_idx = i
-      break
-  start_idx += page*size
-
-  count = 0
-  while start_idx < num_post and count < size:
-    id = posts[start_idx]["postid"]
-    if id <= postid_lte:
-      context["results"].append({"postid":id,"url":flask.request.path+str(id)+"/"})
-      count += 1
-    start_idx += 1
-
-  if count == size:
-    context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(postid_lte)
-  
-  return context
+    # check empty username or password
+    if not username or not password:
+        raise InvalidUsage("Forbidden", status_code=403)
     
-@insta485.app.route('/api/v1/posts/')
-def get_all_post():
-    """Return 10 newest posts."""
-
-    username, password = authenticate()
-    if password == 0:
-      return username
+    # get real password from database
     connection = insta485.model.get_db()
     real_password = connection.execute(
         "SELECT password FROM users WHERE username = ?", (username, )
     ).fetchall()[0]['password']
+    
+    # if password is not correct
+    if not insta485.views.account.check_password_hash(password, real_password):
+        raise InvalidUsage("Forbidden", status_code=403)
 
-    password_salt = real_password.split('$')[1]
-    algorithm = 'sha512'
-    hash_obj = hashlib.new(algorithm)
-    password_salted = password_salt + password
-    hash_obj.update(password_salted.encode('utf-8'))
-    password_hash = hash_obj.hexdigest()
-    my_password = "$".join([algorithm,password_salt,password_hash])
+    return username
 
-    if my_password != real_password:
-      print(password)
-      print(real_password)
-      raise InvalidUsage("Forbidden", status_code=403)
 
+
+def context_generator(username, postid=None):
+    """Generate a context by logname and postid."""
+    # Connect to database
+    connection = insta485.model.get_db()
+
+    if postid is None:
+        cur = insta485.views.index.all_posts_generator(connection, username)
+    else:
+        cur = insta485.views.index.single_posts_generator(connection, postid)
+    
+    posts = cur.fetchall()
+    context={"next":"",
+                "results":[],
+                "url":flask.request.path
+            }
+
+    # the length of posts
+    num_post = len(posts)
+    postid_lte = flask.request.args.get("postid_lte", type=int)
+    page = flask.request.args.get("page",type=int)
+    size = flask.request.args.get("size",type=int)
+    
+    bool_size = False if size is None else True
+    bool_page = False if page is None else True
+    bool_postid_lte = False if postid_lte is None else True
+    if size is None:
+        size = 10
+    if page is None:
+        page = 0
+    if postid_lte is None:
+        if num_post > 0:
+            postid_lte = posts[0]['postid']
+        else: 
+            postid_lte = 0
+
+    # postid_lte is hte ID of the most recent post on the current page
+    # consider cases of empty posts
+
+    # check size and page non-negative integers
+    if size < 0 or page < 0:
+        raise InvalidUsage("Bad request", status_code=400)
+
+    if bool_size or bool_page or bool_postid_lte:
+        context['url'] = flask.request.full_path
+    else:
+        context['url'] = flask.request.path
+    
+    start_idx = 0
+    for i in range(num_post):
+        if posts[i]["postid"] <= postid_lte:
+            start_idx = i
+            break
+    start_idx += page*size
+
+    count = 0
+    if start_idx < num_post and count < size:
+        new_postid_lte = posts[start_idx]["postid"]
+        
+    while start_idx < num_post and count < size:
+        id = posts[start_idx]["postid"]
+        if id <= postid_lte:
+            context["results"].append({"postid":id,"url":flask.request.path+str(id)+"/"})
+            if new_postid_lte < id:
+                new_postid_lte = id
+            count += 1
+        start_idx += 1
+
+    if not bool_postid_lte:
+        new_postid_lte = postid_lte
+
+    if count == size:
+        context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(new_postid_lte) #
+    
+    return context
+    
+@insta485.app.route('/api/v1/posts/')
+def get_all_post():
+    """GET /api/v1/posts/, return 10 newest posts."""
+    username = authenticate()
     context = context_generator(username)
     return flask.jsonify(**context)
 
@@ -143,7 +148,7 @@ def get_all_post():
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
 def get_post(postid_url_slug):
     """Return post detail on postid."""
-    username, password = authenticate()
+    username = authenticate()
     if password == 0:
       return username
 

@@ -7,9 +7,9 @@ set -x
 FILE=var/insta485.sqlite3
 if [ ! -f "$FILE" ]; then
     ./bin/insta485db create
-else
-    echo "the database already exists!"
-    exit 1
+# else
+    # echo "the database already exists!"
+    # exit 1
 fi
 
 test -e var/insta485.sqlite3
