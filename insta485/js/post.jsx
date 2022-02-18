@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+import moment from 'moment'
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 class Allpost extends React.Component {
@@ -106,9 +106,10 @@ class Post extends React.Component {
 
   handleLike(){
     if (this.state.loglike){
+      console.log(this.state.likeurl, "--likeurl prepare to be delete")
       this.setState(prevState =>({
         loglike: !prevState.loglike,
-        numlikes: prevState.numlikes - 1
+        numlikes: prevState.numlikes - 1,
       }));
       const requestOption = {
         method: 'DELETE',
@@ -119,8 +120,10 @@ class Post extends React.Component {
           if (!response.ok) throw Error(response.statusText);
         })
         .catch((error) => console.log(error));
+        this.setState({ likeurl: "" });
     }
     else{
+      console.log(this.state.likeurl, "--likeurl prepare to be like")
       this.setState(prevState =>({
         loglike: !prevState.loglike,
         numlikes: prevState.numlikes + 1
@@ -133,12 +136,12 @@ class Post extends React.Component {
       fetch(url, requestOption)
         .then((response) => {
           if (!response.ok) throw Error(response.statusText);
-          console.log(response)
           return response.json();
         })
         .then(data => {
           this.setState({ likeurl: data.url });
-          console.log(this.state.likeurl, data.likeid)
+          console.log(this.state.likeurl, "--likeurl after like")
+          console.log(data, "response data")
         })
         .catch((error) => console.log(error));
     }
