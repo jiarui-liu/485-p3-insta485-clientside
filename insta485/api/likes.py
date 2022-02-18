@@ -29,7 +29,10 @@ def create_like():
         cur = connection.execute(
             "SELECT * FROM likes"
         ).fetchall()
-        context["likeid"] = cur[-1]["likeid"] + 1
+        if len(cur) == 0:
+            context["likeid"] = 1
+        else:
+            context["likeid"] = cur[-1]["likeid"] + 1
         context["url"] = "/api/v1/likes/" + str(context["likeid"]) + "/"
         # create one like
         connection.execute(
