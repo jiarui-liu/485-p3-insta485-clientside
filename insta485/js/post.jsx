@@ -11,19 +11,28 @@ class Allpost extends React.Component {
   }
 
   componentDidMount(){
-    const {url} = this.props;
-    fetch(url, { credentials: 'same-origin' })
-      .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
-        return response.json();
-      })
-      .then((data) => {
-        this.setState({
-          urls: data.results,
-          next: data.next
-        });
-      })
-      .catch((error) => console.log(error));
+    if (String(window.performance.getEntriesByType('navigation')[0].type) === 'back_forward') {
+      const pastState = window.history.state;
+      this.setState({
+        urls: pastState.urls,
+        next: pastState.next,
+      });
+    }
+    else{
+      const url = this.props.url;
+      fetch(url, { credentials: 'same-origin' })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          this.setState({
+            urls: data.results,
+            next: data.next
+          });
+        })
+        .catch((error) => console.log(error));
+    }
   }
 
   fetchMoreData = () => {
@@ -42,6 +51,7 @@ class Allpost extends React.Component {
         })
         .catch((error) => console.log(error));
     }, 500);
+    window.history.pushState(this.state, '');
   };
 
 
