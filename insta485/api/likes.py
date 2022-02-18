@@ -27,11 +27,9 @@ def create_like():
     # if the like does not exist 
     else:
         cur = connection.execute(
-            "SELECT * FROM likes "
-            "WHERE postid = ?",
-            (postid, )
+            "SELECT * FROM likes"
         ).fetchall()
-        context["likeid"] = len(cur) + 1
+        context["likeid"] = cur[-1]["likeid"] + 1
         context["url"] = "/api/v1/likes/" + str(context["likeid"]) + "/"
         # create one like
         connection.execute(
