@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 class Allpost extends React.Component {
 
   constructor(props){
     super(props);
-    this.state = { urls: [] }
+    this.state = { urls: [], next: "" }
   }
 
   componentDidMount(){
@@ -18,18 +19,43 @@ class Allpost extends React.Component {
       })
       .then((data) => {
         this.setState({
-          urls: data.results
+          urls: data.results,
+          next: data.next
         });
       })
       .catch((error) => console.log(error));
   }
 
+  fetchMoreData = () => {
+    setTimeout(() => {
+      const next_url = this.state.next;
+      fetch(next_url, { credentials: 'same-origin' })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          this.setState({
+            urls: this.state.urls.concat(data.results),
+            next: data.next
+          });
+        })
+        .catch((error) => console.log(error));
+    }, 500);
+  };
+
+
   render(){
-    const {urls} = this.state;
+    const {urls,next} = this.state;
+    console.log(urls.length)
     let posts = urls.map( (dic) =>
       <Post url={dic.url} key={dic.url}/>
     );
-    return <ul>{posts}</ul>;
+    return (
+      <InfiniteScroll dataLength={urls.length} next={this.fetchMoreData} hasMore={true} loader={<h4>Loading...</h4>} >
+      <ul>{posts}</ul>
+      </InfiniteScroll>
+    );
   }
 }
 
