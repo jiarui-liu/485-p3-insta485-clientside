@@ -48,8 +48,8 @@ class Allpost extends React.Component {
   render(){
     const {urls,next} = this.state;
     console.log(urls.length)
-    let posts = urls.map( (dic) =>
-      <Post url={dic.url} key={dic.url}/>
+    let posts = urls.map( (elt) =>
+      <Post url={elt.url} key={elt.url}/>
     );
     return (
       <InfiniteScroll dataLength={urls.length} next={this.fetchMoreData} hasMore={true} loader={<h4>Loading...</h4>} >
@@ -73,12 +73,13 @@ class Post extends React.Component {
     this.handleLike = this.handleLike.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
     this.createComment = this.createComment.bind(this);
+    this.doubleClick = this.doubleClick.bind(this);
   }
 
   componentDidMount() {
     // runs when an instance is added to the DOM
     // This line automatically assigns this.props.url to the const variable url
-    const { url } = this.props;
+    const url  = this.props.url;
 
     // Call REST API to get the post's information
     fetch(url, { credentials: 'same-origin' })
@@ -102,6 +103,12 @@ class Post extends React.Component {
         });
       })
       .catch((error) => console.log(error));
+  }
+
+  doubleClick(event){
+    if (event.detail === 2 && !this.state.loglike){
+      this.handleLike();
+    }
   }
 
   handleLike(){
@@ -150,7 +157,7 @@ class Post extends React.Component {
   deleteComment(commentid){
     let newComments = this.state.comments.slice();
     for (var i=0; i<newComments.length; i++){
-      if (newComments[i].commentid == commentid){
+      if (newComments[i].commentid === commentid){
         newComments.splice(i,1);
       }
     }
@@ -217,7 +224,9 @@ class Post extends React.Component {
           </li>
           <li className="rightSubAlign"><a href={postShowUrl}>{created}</a></li>
         </ul>
-        <img src={imgUrl} />
+        <div onClick={this.doubleClick}>
+          <img src={imgUrl} />
+        </div>
         <p >
           {likestr}
         </p>
