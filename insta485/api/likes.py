@@ -26,16 +26,17 @@ def create_like():
         response = 200
     # if the like does not exist 
     else:
-        cur = connection.execute(
-            "SELECT * FROM likes"
-        ).fetchall()
-        context["likeid"] = len(cur) + 1
-        context["url"] = "/api/v1/likes/" + str(context["likeid"]) + "/"
         # create one like
         connection.execute(
             "INSERT INTO likes(owner, postid) VALUES (?, ?)",
-            (username, postid)
+            (username, postid, )
         )
+        cur = connection.execute(
+            "SELECT likeid FROM likes WHERE owner = ? AND postid = ?",
+            (username, postid)
+        ).fetchall()
+        context["likeid"] = cur[0]["likeid"]
+        context["url"] = "/api/v1/likes/" + str(context["likeid"]) + "/"
         response = 201
 
     return flask.jsonify(**context), response
