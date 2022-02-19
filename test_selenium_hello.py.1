@@ -15,7 +15,7 @@ def test_selenium_hello():
     # browser window will open, and you can play with it using the developer
     # console.
     options = selenium.webdriver.chrome.options.Options()
-    # options.add_argument("--headless") # comment
+    options.add_argument("--headless")
 
     # chromedriver is not in the PATH, so we need to provide selenium with
     # a full path to the executable.
@@ -43,7 +43,6 @@ def test_selenium_hello():
 
     # Load Google search main page
     driver.get("https://www.google.com")
-    # breakpoint()
 
     # Find the search input box, which looks like this:
     #   <input name="q" type="text">

@@ -7,7 +7,7 @@ class Allpost extends React.Component {
 
   constructor(props){
     super(props);
-    this.state = { urls: [], next: "" }
+    this.state = { urls: [], next: "", hasMore: true }
   }
 
   componentDidMount(){
@@ -36,8 +36,15 @@ class Allpost extends React.Component {
   }
 
   fetchMoreData = () => {
+    console.log(this.state.urls.length)
+    console.log(this.state.hasMore)
     setTimeout(() => {
       const next_url = this.state.next;
+      if (next_url === ""){
+        this.setState({ hasMore: false });
+        return;
+      }
+
       fetch(next_url, { credentials: 'same-origin' })
         .then((response) => {
           if (!response.ok) throw Error(response.statusText);
@@ -50,19 +57,18 @@ class Allpost extends React.Component {
           });
         })
         .catch((error) => console.log(error));
-    }, 500);
+    }, 3000);
     window.history.pushState(this.state, '');
   };
 
 
   render(){
-    const {urls,next} = this.state;
-    console.log(urls.length)
+    const {urls,next,hasMore} = this.state;
     let posts = urls.map( (elt) =>
       <Post url={elt.url} key={elt.url}/>
     );
     return (
-      <InfiniteScroll dataLength={urls.length} next={this.fetchMoreData} hasMore={true} loader={<h4>Loading...</h4>} >
+      <InfiniteScroll dataLength={urls.length} next={this.fetchMoreData} hasMore={this.state.hasMore} loader={<h4>Loading...</h4>} >
       <ul>{posts}</ul>
       </InfiniteScroll>
     );
@@ -140,7 +146,6 @@ class Post extends React.Component {
         this.setState({ likeurl: "" });
     }
     else{
-      console.log(this.state.likeurl, "--likeurl prepare to be like")
       this.setState(prevState =>({
         loglike: !prevState.loglike,
         numlikes: prevState.numlikes + 1
@@ -157,8 +162,6 @@ class Post extends React.Component {
         })
         .then(data => {
           this.setState({ likeurl: data.url });
-          console.log(this.state.likeurl, "--likeurl after like")
-          console.log(data, "response data")
         })
         .catch((error) => console.log(error));
     }
