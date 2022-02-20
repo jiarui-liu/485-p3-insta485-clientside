@@ -1,7 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-class CommentCreateForm extends React.Component
-{
+class CommentCreateForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { value: '' };
@@ -26,7 +26,7 @@ class CommentCreateForm extends React.Component
     const { value } = this.state;
     return (
       <form className="comment-form" onSubmit={this.handleSubmit}>
-        <label>
+        <label htmlFor="first-name">
           Create Comment:
           <input type="text" value={value} onChange={this.handleChange} />
         </label>
@@ -34,3 +34,9 @@ class CommentCreateForm extends React.Component
     );
   }
 }
+
+CommentCreateForm.propTypes = {
+  createComment: PropTypes.string.isRequired,
+};
+
+export default CommentCreateForm;

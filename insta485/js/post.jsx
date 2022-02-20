@@ -171,7 +171,15 @@ class Post extends React.Component {
     if (numlikes === 1) likestr = '1 like';
     else likestr = `${numlikes} likes`;
 
-    const commentField = comments.map((comment) => <Comment comment={comment} deleteComment={this.deleteComment} key={comment.url} />);
+    const commentField = comments.map(
+      (comment) => (
+        <Comment
+          comment={comment}
+          deleteComment={this.deleteComment}
+          key={comment.url}
+        />
+      ),
+    );
 
     // console.log(loglike)
     return (
@@ -208,3 +216,5 @@ class Post extends React.Component {
 Post.propTypes = {
   url: PropTypes.string.isRequired,
 };
+
+export default Post;

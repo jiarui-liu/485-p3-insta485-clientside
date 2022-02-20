@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Post from './post';
 
@@ -69,12 +70,17 @@ class Allpost extends React.Component {
         dataLength={urls.length}
         next={this.fetchMoreData}
         hasMore={hasMore}
-        loader={<h4>Loading...</h4>}>
+        loader={<h4>Loading...</h4>}
+      >
         <ul>{posts}</ul>
       </InfiniteScroll>
     );
   }
 }
+
+Allpost.propTypes = {
+  url: PropTypes.string.isRequired,
+};
 
 // export default Post;
 export default Allpost;
