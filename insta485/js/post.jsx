@@ -103,10 +103,10 @@ class Post extends React.Component {
 
   dbClick() {
     // let url = this.props.allpost
-    const { loglike } = this.state;
-    if (!loglike) {
-      this.handleLike();
-    }
+    // const { loglike } = this.state;
+    // if (!loglike) {
+    this.handleLike();
+    // }
   }
 
   deleteComment(commentid) {
@@ -205,7 +205,7 @@ class Post extends React.Component {
         <p>
           {likestr}
         </p>
-        <LikeButton islike={loglike} handleLike={this.handleLike} />
+        <LikeButton islike={loglike} dbClick={this.dbClick} />
         <ul className="main">{commentField}</ul>
         <CommentCreateForm createComment={this.createComment} />
       </div>

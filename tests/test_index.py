@@ -352,7 +352,9 @@ def test_like_unlike(live_server, driver):
     )
     assert len(like_buttons) == 3
     like_button = like_buttons[0]
-    like_button.click()
+    # like_button.click()
+    action_chains = ActionChains(driver)
+    action_chains.double_click(like_button).perform()
 
     # First post started with 1 like by awdeorio, now it should be 0
     assert driver.find_elements(
@@ -366,7 +368,9 @@ def test_like_unlike(live_server, driver):
     )
     assert len(like_buttons) == 3
     like_button = like_buttons[0]
-    like_button.click()
+    # like_button.click()
+    action_chains = ActionChains(driver)
+    action_chains.double_click(like_button).perform()
 
     # First post should now have 1 like
     assert driver.find_elements(

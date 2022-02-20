@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function LikeButton(props) {
-  const { handleLike, islike } = props;
+  const { dbClick, islike } = props;
   return (
     <button
       type="button"
       className="like-unlike-button"
-      onClick={() => {
-        handleLike();
+      onDoubleClick={() => {
+        dbClick();
       }}
     >
       {islike ? 'unlike' : 'like'}
@@ -17,7 +17,7 @@ function LikeButton(props) {
 }
 
 LikeButton.propTypes = {
-  handleLike: PropTypes.func.isRequired,
+  dbClick: PropTypes.func.isRequired,
   islike: PropTypes.bool.isRequired,
 };
 
