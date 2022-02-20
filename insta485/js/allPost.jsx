@@ -25,7 +25,7 @@ class Allpost extends React.Component {
           return response.json();
         })
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           this.setState({
             urls: data.results,
             next: data.next,
@@ -51,12 +51,12 @@ class Allpost extends React.Component {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         this.setState((prevState) => ({
           urls: prevState.urls.concat(data.results),
           next: data.next,
         }));
-        console.log(data.results.length);
+        // console.log(data.results.length);
       })
       .catch((error) => console.log(error));
     window.history.pushState(this.state, '');

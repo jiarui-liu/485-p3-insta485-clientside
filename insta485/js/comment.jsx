@@ -26,7 +26,13 @@ function Comment(props) {
 }
 
 Comment.propTypes = {
-  comment: PropTypes.string.isRequired,
+  comment: PropTypes.shape({
+    ownerShowUrl: PropTypes.string,
+    owner: PropTypes.string,
+    text: PropTypes.string,
+    lognameOwnsThis: PropTypes.bool,
+    commentid: PropTypes.number,
+  }).isRequired,
   deleteComment: PropTypes.func.isRequired,
 };
 

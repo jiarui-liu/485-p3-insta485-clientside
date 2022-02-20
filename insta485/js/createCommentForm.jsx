@@ -36,7 +36,7 @@ class CommentCreateForm extends React.Component {
 }
 
 CommentCreateForm.propTypes = {
-  createComment: PropTypes.string.isRequired,
+  createComment: PropTypes.func.isRequired,
 };
 
 export default CommentCreateForm;

@@ -64,7 +64,7 @@ class Post extends React.Component {
   handleLike() {
     const { loglike, likeurl, postid } = this.state;
     if (loglike) {
-      console.log(likeurl, '--likeurl prepare to be delete');
+      // console.log(likeurl, '--likeurl prepare to be delete');
       this.setState((prevState) => ({
         loglike: !prevState.loglike,
         numlikes: prevState.numlikes - 1,
