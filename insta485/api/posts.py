@@ -76,10 +76,11 @@ def context_generator(username, postid=None):
     postid_lte = flask.request.args.get("postid_lte", type=int)
     page = flask.request.args.get("page",type=int)
     size = flask.request.args.get("size",type=int)
+    if size is not None or page is not None or postid_lte is not None:
+        context['url'] = flask.request.full_path
+    else:
+        context['url'] = flask.request.path
     
-    bool_size = False if size is None else True
-    bool_page = False if page is None else True
-    bool_postid_lte = False if postid_lte is None else True
     if size is None:
         size = 10
     if page is None:
@@ -97,36 +98,29 @@ def context_generator(username, postid=None):
     if size < 0 or page < 0:
         raise InvalidUsage("Bad request", status_code=400)
 
-    if bool_size or bool_page or bool_postid_lte:
-        context['url'] = flask.request.full_path
-    else:
-        context['url'] = flask.request.path
+    cur = connection.execute(
+        "SELECT * FROM posts ORDER BY postid DESC"
+    ).fetchall()
+    cnt = 0
+    for item in cur:
+        if item['postid'] > postid_lte:
+            cnt += 1
     
-    start_idx = 0
-    for i in range(num_post):
-        if posts[i]["postid"] <= postid_lte:
-            start_idx = i
-            break
-    start_idx += page*size
-
-    count = 0
-    if start_idx < num_post and count < size:
-        new_postid_lte = posts[start_idx]["postid"]
-        
-    while start_idx < num_post and count < size:
-        id = posts[start_idx]["postid"]
-        if id <= postid_lte:
-            context["results"].append({"postid":id,"url":flask.request.path+str(id)+"/"})
-            if new_postid_lte < id:
-                new_postid_lte = id
-            count += 1
-        start_idx += 1
-
-    # if not bool_postid_lte:
-    new_postid_lte = postid_lte
-
-    if count == size:
-        context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(new_postid_lte) #
+    cur = connection.execute(
+        "SELECT * FROM posts ORDER BY postid DESC LIMIT ? OFFSET ?", (size, page * size + cnt, )
+    ).fetchall()
+    if len(cur) >= size:
+        for iter in range(size):
+            context["results"].append({'postid': cur[iter]['postid'],
+            'url': flask.request.path+str(cur[iter]['postid'])+'/'
+            })
+        new_postid_lte = postid_lte
+        context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(new_postid_lte)
+    else:
+        for iter in range(len(cur)):
+            context["results"].append({'postid': cur[iter]['postid'],
+            'url': flask.request.path+str(cur[iter]['postid'])+'/'
+            })
     
     return context
     
