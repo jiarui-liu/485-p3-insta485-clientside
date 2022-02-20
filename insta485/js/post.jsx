@@ -8,6 +8,7 @@ class Allpost extends React.Component {
   constructor(props){
     super(props);
     this.state = { urls: [], next: "", hasMore: true }
+    this.fetchMoreData = this.fetchMoreData.bind(this);
   }
 
   componentDidMount(){
@@ -26,6 +27,7 @@ class Allpost extends React.Component {
           return response.json();
         })
         .then((data) => {
+          console.log(data)
           this.setState({
             urls: data.results,
             next: data.next
@@ -36,28 +38,28 @@ class Allpost extends React.Component {
   }
 
   fetchMoreData = () => {
-    console.log(this.state.urls.length)
-    console.log(this.state.hasMore)
-    setTimeout(() => {
-      const next_url = this.state.next;
-      if (next_url === ""){
-        this.setState({ hasMore: false });
-        return;
-      }
+    const next_url = this.state.next;
+    if (next_url === ""){
+      this.setState({ hasMore: false });
+      return;
+    }
+    // console.log(this.state.hasMore)
+    // console.log(this.state.urls)
 
-      fetch(next_url, { credentials: 'same-origin' })
-        .then((response) => {
-          if (!response.ok) throw Error(response.statusText);
+    fetch(next_url, { credentials: 'same-origin' })
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
           return response.json();
         })
-        .then((data) => {
-          this.setState({
-            urls: this.state.urls.concat(data.results),
-            next: data.next
-          });
-        })
-        .catch((error) => console.log(error));
-    }, 3000);
+      .then((data) => {
+        console.log(data)
+        this.setState((prevState) => ({
+          urls: prevState.urls.concat(data.results),
+          next: data.next,
+        }));
+        console.log(data.results.length)
+      })
+      .catch((error) => console.log(error));
     window.history.pushState(this.state, '');
   };
 
@@ -89,7 +91,7 @@ class Post extends React.Component {
     this.handleLike = this.handleLike.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
     this.createComment = this.createComment.bind(this);
-    this.doubleClick = this.doubleClick.bind(this);
+    this.dbClick = this.dbClick.bind(this);
   }
 
   componentDidMount() {
@@ -121,8 +123,10 @@ class Post extends React.Component {
       .catch((error) => console.log(error));
   }
 
-  doubleClick(event){
-    if (event.detail === 2 && !this.state.loglike){
+  dbClick(){
+    // let url = this.props.allpost
+    let {loglike} = this.state
+    if (!loglike){
       this.handleLike();
     }
   }
@@ -154,7 +158,7 @@ class Post extends React.Component {
         method: 'POST',
         credentials: 'same-origin'
       }
-      const url = "http://localhost:8000/api/v1/likes/?postid=" + this.state.postid.toString();
+      const url = "/api/v1/likes/?postid=" + this.state.postid.toString();
       fetch(url, requestOption)
         .then((response) => {
           if (!response.ok) throw Error(response.statusText);
@@ -237,9 +241,7 @@ class Post extends React.Component {
           </li>
           <li className="rightSubAlign"><a href={postShowUrl}>{created}</a></li>
         </ul>
-        <div onClick={this.doubleClick}>
-          <img src={imgUrl} />
-        </div>
+          <img src={imgUrl} onDoubleClick={this.dbClick}/>
         <p >
           {likestr}
         </p>

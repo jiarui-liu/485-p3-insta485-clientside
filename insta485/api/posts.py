@@ -122,8 +122,8 @@ def context_generator(username, postid=None):
             count += 1
         start_idx += 1
 
-    if not bool_postid_lte:
-        new_postid_lte = postid_lte
+    # if not bool_postid_lte:
+    new_postid_lte = postid_lte
 
     if count == size:
         context['next'] = flask.request.path+"?size="+str(size)+"&page="+str(page+1)+"&postid_lte="+str(new_postid_lte) #

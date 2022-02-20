@@ -11,7 +11,7 @@ if [ ! -f "$FILE" ]; then
     # echo "the database already exists!"
     # exit 1
 fi
-./bin/insta485db random
+# ./bin/insta485db random
 test -e var/insta485.sqlite3
 export FLASK_ENV=development
 FLASK_ENV=development
