@@ -1,6 +1,7 @@
-"""REST API for comments"""
+"""REST API for comments."""
 import flask
 import insta485
+
 
 @insta485.app.route('/api/v1/comments/', methods=['POST'])
 def create_comment():
@@ -33,6 +34,7 @@ def create_comment():
     context['url'] = '/api/v1/comments/' + str(commentid) + '/'
     return flask.jsonify(**context), 201
 
+
 @insta485.app.route('/api/v1/comments/<int:commentid>/', methods=['DELETE'])
 def delete_comment(commentid):
     """DELETE /api/v1/comments/<commentid>/."""
@@ -43,13 +45,17 @@ def delete_comment(commentid):
         "WHERE commentid = ?",
         (commentid, )
     ).fetchall()
-    
+
     # if the commentid does not exist, return 404
     if len(cur) == 0:
-        return insta485.api.posts.handle_invalid_usage(insta485.api.posts.InvalidUsage("The commentid is not found", 404))
+        return insta485.api.posts.handle_invalid_usage(
+            insta485.api.posts.InvalidUsage(
+                "The commentid is not found", 404))
     # if the user does not own the comment, return 403
     if cur[0]['owner'] != username:
-        return insta485.api.posts.handle_invalid_usage(insta485.api.posts.InvalidUsage("The user does not own the comment", 403))
+        return insta485.api.posts.handle_invalid_usage(
+            insta485.api.posts.InvalidUsage(
+                "The user does not own the comment", 403))
     # delete one comment, return 204 on success
     connection.execute(
         "DELETE FROM comments "

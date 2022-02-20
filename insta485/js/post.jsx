@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment'
+import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 class Allpost extends React.Component {
@@ -37,7 +37,7 @@ class Allpost extends React.Component {
     }
   }
 
-  fetchMoreData = () => {
+  fetchMoreData(){
     const next_url = this.state.next;
     if (next_url === ""){
       this.setState({ hasMore: false });
@@ -61,7 +61,7 @@ class Allpost extends React.Component {
       })
       .catch((error) => console.log(error));
     window.history.pushState(this.state, '');
-  };
+  }
 
 
   render(){
