@@ -7,7 +7,7 @@ function LikeButton(props) {
     <button
       type="button"
       className="like-unlike-button"
-      onDoubleClick={() => {
+      onClick={() => {
         dbClick();
       }}
     >

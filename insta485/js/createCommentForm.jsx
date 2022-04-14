@@ -19,7 +19,7 @@ class CommentCreateForm extends React.Component {
     const { value } = this.state;
     this.setState({ value: '' });
     createComment(value);
-    event.preventDefault();
+    event.preventDefault(); // needed for form onClick submit!
   }
 
   render() {

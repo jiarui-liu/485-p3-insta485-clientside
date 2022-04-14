@@ -4,6 +4,7 @@ import moment from 'moment';
 import CommentCreateForm from './createCommentForm';
 import Comment from './comment';
 import LikeButton from './likeButton';
+import Image from './image';
 
 class Post extends React.Component {
   /* Display number of image and post owner of a single post
@@ -103,10 +104,10 @@ class Post extends React.Component {
 
   dbClick() {
     // let url = this.props.allpost
-    // const { loglike } = this.state;
-    // if (!loglike) {
-    this.handleLike();
-    // }
+    const { loglike } = this.state;
+    if (!loglike) {
+      this.handleLike();
+    }
   }
 
   deleteComment(commentid) {
@@ -201,11 +202,11 @@ class Post extends React.Component {
           </li>
           <li className="rightSubAlign"><a href={postShowUrl}>{created}</a></li>
         </ul>
-        <img src={imgUrl} onDoubleClick={this.dbClick} alt="imgUrl" />
+        <Image imgUrl={imgUrl} dbClick={this.dbClick} />
         <p>
           {likestr}
         </p>
-        <LikeButton islike={loglike} dbClick={this.dbClick} />
+        <LikeButton islike={loglike} dbClick={this.handleLike} />
         <ul className="main">{commentField}</ul>
         <CommentCreateForm createComment={this.createComment} />
       </div>

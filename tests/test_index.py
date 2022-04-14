@@ -439,11 +439,11 @@ def test_double_click_like(live_server, driver):
     action_chains = ActionChains(driver)
     action_chains.double_click(jflinn_post_image).perform()
 
+    print(By.XPATH)
     # First post started with 1 like, now it should be 0
     assert driver.find_elements(
         By.XPATH,
         "//*[contains(normalize-space(.), '1 like')]")
-
     # Get a fresh reference because the DOM element may have been refreshed
     images = driver.find_elements(
         By.XPATH,
